@@ -1,0 +1,56 @@
+<script type="text/javascript">
+    RED.nodes.registerType('homeeUtil', {
+        category: "homee",
+        color: "#a6cfc7",
+        defaults: {
+            name: { value: "" },
+            'util': { value: '', validate: RED.validators.number() },
+            'virtual-homee': { value: '', type: 'virtualHomee', required: true },
+            'profile': { value: '', validate: RED.validators.number() },
+        },
+        icon: 'debug.png',
+        inputs: 1,
+        outputs: 1,
+        label: function () {
+            return this.name || 'homeeUtil';
+        },
+        oneditprepare: async function () {
+
+            const res1 = await fetch('/homee-api/enums');
+            const enums = await res1.json();
+
+            for (profile in enums.CANodeProfile) {
+                const option = document.createElement('option')
+                option.setAttribute('value', enums.CANodeProfile[profile])
+                option.appendChild(document.createTextNode(profile.replace('CANodeProfile', '')));
+
+                document.querySelector('#node-input-profile').appendChild(option)
+            }
+
+            document.querySelector('#node-input-profile').value = this.profile;
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="homeeUtil">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-virtual-homee"><i class="fa fa-cube"></i> Virtual Homee</label>
+        <input type="text" id="node-input-virtual-homee" placeholder="homee" style="width: 70%">
+    </div>
+    <div class="form-row">
+        <label for="node-input-util"><i class="fa fa-id-badge"></i> Util</label>
+        <select id="node-input-util" style="width: 70%">
+            <option value="0">Get virtual homee</option>
+            <option value="1">Get attributes for profile</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-profile"><i class="fa fa-id-badge"></i> Profile</label>
+        <select id="node-input-profile" style="width: 70%"></select>
+    </div>
+    <div class="form-tips"><b>Tip:</b> This is here to help.</div>
+</script>
